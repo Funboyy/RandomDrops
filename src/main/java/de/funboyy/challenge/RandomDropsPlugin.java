@@ -6,8 +6,6 @@ import de.funboyy.challenge.listener.ProtectionListener;
 import de.funboyy.challenge.listener.RandomDropListener;
 import de.funboyy.challenge.utils.Timer;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,10 +20,11 @@ public class RandomDropsPlugin extends JavaPlugin {
     }
 
     @Getter private Timer timer;
-    @Accessors(fluent = true) @Getter @Setter private boolean failOnDeath = true;
 
     @Override
     public void onEnable() {
+        loadConfig();
+
         this.timer = new Timer();
         timer();
 
@@ -37,6 +36,13 @@ public class RandomDropsPlugin extends JavaPlugin {
         if (command != null) {
             command.setExecutor(new ChallengeCommand());
         }
+    }
+
+    private void loadConfig() {
+        this.saveDefaultConfig();
+
+        this.getConfig().options().copyDefaults(true);
+        this.reloadConfig();
     }
 
     private void timer() {
