@@ -28,7 +28,8 @@ public class RandomDrop {
             Material.WRITTEN_BOOK,
             Material.FILLED_MAP,
             Material.ENCHANTED_BOOK,
-            Material.TIPPED_ARROW
+            Material.TIPPED_ARROW,
+            Material.AIR
     );
 
     private static boolean isDrop(final Material material) {
