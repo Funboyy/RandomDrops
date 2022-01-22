@@ -1,6 +1,6 @@
 package de.funboyy.challenge.command;
 
-import de.funboyy.challenge.Message;
+import de.funboyy.challenge.Config;
 import de.funboyy.challenge.RandomDropsPlugin;
 import javax.annotation.Nonnull;
 import org.bukkit.command.Command;
@@ -14,12 +14,12 @@ public class ChallengeCommand implements CommandExecutor {
                              @Nonnull final String label, @Nonnull final String[] args) {
 
         if (!sender.hasPermission("randomdrops.command.challenge")) {
-            sender.sendMessage(Message.getInstance().getNoPermission());
+            sender.sendMessage(Config.getInstance().getNoPermission());
             return true;
         }
 
         if (args.length != 1) {
-            sender.sendMessage(Message.getInstance().getChallengeHelp());
+            sender.sendMessage(Config.getInstance().getChallengeHelp());
             return true;
         }
 
@@ -38,55 +38,70 @@ public class ChallengeCommand implements CommandExecutor {
             return true;
         }
 
-        sender.sendMessage(Message.getInstance().getChallengeHelp());
+        sender.sendMessage(Config.getInstance().getChallengeHelp());
         return true;
     }
 
     private void start(final CommandSender sender) {
+        if (!sender.hasPermission("randomdrops.command.challenge.start")) {
+            sender.sendMessage(Config.getInstance().getNoPermission());
+            return;
+        }
+
         if (RandomDropsPlugin.getInstance().getTimer().isFinished()) {
-            sender.sendMessage(Message.getInstance().getChallengeAlreadyFinished());
+            sender.sendMessage(Config.getInstance().getChallengeAlreadyFinished());
             return;
         }
 
         if (RandomDropsPlugin.getInstance().getTimer().isRunning()) {
-            sender.sendMessage(Message.getInstance().getChallengeAlreadyRunning());
+            sender.sendMessage(Config.getInstance().getChallengeAlreadyRunning());
             return;
         }
 
         RandomDropsPlugin.getInstance().getTimer().start();
-        sender.sendMessage(Message.getInstance().getChallengeStart());
+        sender.sendMessage(Config.getInstance().getChallengeStart());
     }
 
     private void stop(final CommandSender sender) {
+        if (!sender.hasPermission("randomdrops.command.challenge.stop")) {
+            sender.sendMessage(Config.getInstance().getNoPermission());
+            return;
+        }
+
         if (RandomDropsPlugin.getInstance().getTimer().isFinished()) {
-            sender.sendMessage(Message.getInstance().getChallengeAlreadyFinished());
+            sender.sendMessage(Config.getInstance().getChallengeAlreadyFinished());
             return;
         }
 
         if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
-            sender.sendMessage(Message.getInstance().getChallengeAlreadyPaused());
+            sender.sendMessage(Config.getInstance().getChallengeAlreadyPaused());
             return;
         }
 
         RandomDropsPlugin.getInstance().getTimer().stop();
-        sender.sendMessage(Message.getInstance().getChallengePause());
+        sender.sendMessage(Config.getInstance().getChallengePause());
     }
 
     private void toggleFail(final CommandSender sender) {
-        if (RandomDropsPlugin.getInstance().getTimer().isFinished()) {
-            sender.sendMessage(Message.getInstance().getChallengeAlreadyFinished());
+        if (!sender.hasPermission("randomdrops.command.challenge.togglefail")) {
+            sender.sendMessage(Config.getInstance().getNoPermission());
             return;
         }
 
-        final boolean fail = !RandomDropsPlugin.getInstance().failOnDeath();
-        RandomDropsPlugin.getInstance().failOnDeath(fail);
+        if (RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+            sender.sendMessage(Config.getInstance().getChallengeAlreadyFinished());
+            return;
+        }
+
+        final boolean fail = !Config.getInstance().failOnDeath();
+        Config.getInstance().setFailOnDeath(fail);
 
         if (fail) {
-            sender.sendMessage(Message.getInstance().getChallengeToggleEnable());
+            sender.sendMessage(Config.getInstance().getChallengeToggleEnable());
             return;
         }
 
-        sender.sendMessage(Message.getInstance().getChallengeToggleDisable());
+        sender.sendMessage(Config.getInstance().getChallengeToggleDisable());
     }
 
 }
