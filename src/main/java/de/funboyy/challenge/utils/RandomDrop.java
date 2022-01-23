@@ -29,6 +29,7 @@ public class RandomDrop {
             Material.FILLED_MAP,
             Material.ENCHANTED_BOOK,
             Material.TIPPED_ARROW,
+            Material.END_PORTAL_FRAME,
             Material.AIR
     );
 
