@@ -30,6 +30,7 @@ public class RandomDrop {
             Material.ENCHANTED_BOOK,
             Material.TIPPED_ARROW,
             Material.END_PORTAL_FRAME,
+            Material.SUSPICIOUS_STEW,
             Material.AIR
     );
 
