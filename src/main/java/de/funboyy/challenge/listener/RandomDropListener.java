@@ -1,7 +1,7 @@
 package de.funboyy.challenge.listener;
 
-import de.funboyy.challenge.utils.NBTUtils;
 import de.funboyy.challenge.RandomDropsPlugin;
+import de.funboyy.challenge.utils.NBTUtils;
 import de.funboyy.challenge.utils.RandomDrop;
 import java.util.Arrays;
 import java.util.Objects;
@@ -10,8 +10,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartChest;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartContainer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartHopper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -22,6 +27,10 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.Lootable;
@@ -31,10 +40,6 @@ public class RandomDropListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onItemSpawn(final ItemSpawnEvent event) {
         if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
-            return;
-        }
-
-        if (event.getEntity().getThrower() != null) {
             return;
         }
 
@@ -48,6 +53,18 @@ public class RandomDropListener implements Listener {
 
         final ItemStack drop = RandomDrop.getInstance().getDrop(item);
         item.setItemStack(drop);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDrop(final PlayerDropItemEvent event) {
+        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+            return;
+        }
+
+        final Item item = event.getItemDrop();
+        final ItemStack itemStack = item.getItemStack();
+
+        item.setItemStack(NBTUtils.addTag(itemStack));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -162,6 +179,51 @@ public class RandomDropListener implements Listener {
         event.getDrops().forEach(item ->
                 location.getWorld().dropItemNaturally(location, NBTUtils.addTag(item)));
         event.getDrops().clear();
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onVehicleDestroy(final VehicleDestroyEvent event) {
+        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+            return;
+        }
+
+        if (!(event.getVehicle() instanceof Minecart)) {
+            return;
+        }
+
+        dropLootEntity(event.getVehicle());
+    }
+
+    private void dropLootEntity(final Entity entity) {
+        if (!(entity instanceof CraftMinecartContainer)) {
+            return;
+        }
+
+        final Inventory inventory;
+
+        if (entity instanceof CraftMinecartChest) {
+            inventory = ((CraftMinecartChest) entity).getInventory();
+        } else {
+            inventory = ((CraftMinecartHopper) entity).getInventory();
+        }
+
+        ItemStack[] items = inventory.getContents();
+        final Location location = entity.getLocation();
+
+        if (location.getWorld() == null) {
+            return;
+        }
+
+        final Lootable loot = (Lootable) entity;
+
+        if (loot.getLootTable() != null) {
+            final LootContext.Builder lootContextBuilder = new LootContext.Builder(entity.getLocation());
+            items = loot.getLootTable().populateLoot(new Random(), lootContextBuilder.build()).toArray(new ItemStack[0]);
+        }
+
+        inventory.clear();
+        Arrays.stream(items).filter(Objects::nonNull).forEach(item ->
+                location.getWorld().dropItemNaturally(location, NBTUtils.addTag(item)));
     }
 
 }
