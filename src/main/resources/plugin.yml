@@ -1,8 +1,9 @@
+#file: noinspection YAMLSchemaValidation
 name: ${project.name}
 author: ${project.organization.name}
 version: ${project.version}
 main: ${project.main}
-api-version: 1.14
+api-version: 1.19
 
 commands:
   challenge:

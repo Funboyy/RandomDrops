@@ -1,24 +1,24 @@
 package de.funboyy.challenge.utils;
 
-import net.minecraft.server.v1_16_R3.ItemStack;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.item.ItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 
 public class NBTUtils {
 
     public static org.bukkit.inventory.ItemStack addTag(final org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack item = CraftItemStack.asNMSCopy(itemStack);
-        final NBTTagCompound compound = item.getOrCreateTag();
+        final NBTTagCompound compound = item.v();
 
-        compound.setBoolean("CustomDrops", true);
-        item.setTag(compound);
+        compound.a("CustomDrops", true);
+        item.c(compound);
 
         return CraftItemStack.asBukkitCopy(item);
     }
 
     public static org.bukkit.inventory.ItemStack removeTag(final org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack item = CraftItemStack.asNMSCopy(itemStack);
-        item.removeTag("CustomDrops");
+        item.c("CustomDrops");
 
         return CraftItemStack.asBukkitCopy(item);
     }
@@ -26,17 +26,17 @@ public class NBTUtils {
     public static boolean hasTag(final org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack item = CraftItemStack.asNMSCopy(itemStack);
 
-        if (!item.hasTag()) {
+        if (!item.t()) {
             return false;
         }
 
-        final NBTTagCompound compound = item.getTag();
+        final NBTTagCompound compound = item.u();
 
         if (compound == null) {
             return false;
         }
 
-        return compound.hasKey("CustomDrops");
+        return compound.e("CustomDrops");
     }
 
 }

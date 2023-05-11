@@ -9,12 +9,12 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 
 public class ProtectionListener implements Listener {
 
@@ -51,7 +51,7 @@ public class ProtectionListener implements Listener {
     }
 
     @EventHandler
-    public void onPickUp(final PlayerPickupItemEvent event) {
+    public void onPickUp(final EntityPickupItemEvent event) {
         if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
                 !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
             event.setCancelled(true);
