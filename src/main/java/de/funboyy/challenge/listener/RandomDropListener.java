@@ -10,9 +10,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartChest;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartContainer;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartHopper;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartChest;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartContainer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartHopper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
@@ -28,7 +28,6 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -82,11 +81,10 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        if (!(event.getEntity() instanceof ItemFrame)) {
+        if (!(event.getEntity() instanceof ItemFrame frame)) {
             return;
         }
 
-        final ItemFrame frame = (ItemFrame) event.getEntity();
         frame.setItem(NBTUtils.addTag(frame.getItem()));
     }
 
@@ -96,11 +94,10 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        if (!(event.getEntity() instanceof ItemFrame)) {
+        if (!(event.getEntity() instanceof ItemFrame frame)) {
             return;
         }
 
-        final ItemFrame frame = (ItemFrame) event.getEntity();
         final ItemStack item = frame.getItem();
 
         if (item.getType() == Material.AIR) {
@@ -138,11 +135,10 @@ public class RandomDropListener implements Listener {
     }
 
     private void dropLoot(final BlockState state) {
-        if (!(state instanceof Container)) {
+        if (!(state instanceof Container container)) {
             return;
         }
 
-        final Container container = (Container) state;
         ItemStack[] items = container.getInventory().getContents();
         final Location location = state.getLocation().add(0.5, 0, 0.5);
 
@@ -150,13 +146,9 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        if (state instanceof Lootable) {
-            final Lootable loot = (Lootable) state;
-
-            if (loot.getLootTable() != null) {
-                final LootContext.Builder lootContextBuilder = new LootContext.Builder(state.getLocation());
-                items = loot.getLootTable().populateLoot(new Random(), lootContextBuilder.build()).toArray(new ItemStack[0]);
-            }
+        if (state instanceof Lootable loot && loot.getLootTable() != null) {
+            final LootContext.Builder lootContextBuilder = new LootContext.Builder(state.getLocation());
+            items = loot.getLootTable().populateLoot(new Random(), lootContextBuilder.build()).toArray(new ItemStack[0]);
         }
 
         container.getInventory().clear();

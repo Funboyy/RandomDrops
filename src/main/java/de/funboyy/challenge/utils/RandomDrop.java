@@ -1,7 +1,6 @@
 package de.funboyy.challenge.utils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +16,7 @@ public class RandomDrop {
         return instance;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static final List<Material> BLOCKED_DROPS = Arrays.asList(
             Material.BARRIER,
             Material.SPAWNER,
@@ -30,32 +30,46 @@ public class RandomDrop {
             Material.ENCHANTED_BOOK,
             Material.TIPPED_ARROW,
             Material.END_PORTAL_FRAME,
-            Material.SUSPICIOUS_STEW,
-            Material.AIR
+            Material.LIGHT,
+            Material.BUNDLE,
+            Material.CHISELED_BOOKSHELF,
+            Material.PIGLIN_HEAD,
+            Material.PINK_PETALS,
+            Material.BRUSH,
+            Material.DECORATED_POT,
+            Material.PAINTING
+    );
+
+    private static final List<String> BLOCKED_DROP_NAMES = Arrays.asList(
+            "COMMAND_BLOCK",
+            "SPAWN_EGG",
+            "STRUCTURE",
+            "POTION",
+            "SMITHING_TEMPLATE",
+            "HANGING_SIGN",
+            "BAMBOO_",
+            "CHERRY",
+            "SUSPICIOUS",
+            "POTTERY_SHARD",
+            "TORCHFLOWER"
     );
 
     private static boolean isDrop(final Material material) {
-        if (material.name().contains("COMMAND_BLOCK")) {
+        if (material.isAir()) {
             return false;
         }
 
-        if (material.name().contains("SPAWN_EGG")) {
-            return false;
-        }
-
-        if (material.name().contains("STRUCTURE")) {
-            return false;
-        }
-
-        if (material.name().contains("POTION")) {
-            return false;
+        for (final String blockedName : BLOCKED_DROP_NAMES) {
+            if (material.name().contains(blockedName)) {
+                return false;
+            }
         }
 
         return !BLOCKED_DROPS.contains(material);
     }
 
     private static final List<Material> DROPS = Arrays.stream(Material.values()).filter(Material::isItem)
-            .filter(RandomDrop::isDrop).collect(Collectors.toList());
+            .filter(RandomDrop::isDrop).toList();
 
 
     private final Map<Material, Material> randomDrops;
@@ -73,7 +87,7 @@ public class RandomDrop {
 
         final List<Material> drops = DROPS.stream()
                 .filter(drop -> !this.randomDrops.containsValue(drop))
-                .collect(Collectors.toList());
+                .toList();
 
         final Material drop = drops.get(this.random.nextInt(drops.size()));
         this.randomDrops.put(material, drop);

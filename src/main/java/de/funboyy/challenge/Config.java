@@ -23,6 +23,7 @@ public class Config {
         return ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", getPrefix()));
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean failOnDeath() {
         return RandomDropsPlugin.getInstance().getConfig().getBoolean("failOnDeath");
     }
