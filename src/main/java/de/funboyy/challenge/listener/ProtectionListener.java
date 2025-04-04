@@ -1,6 +1,8 @@
 package de.funboyy.challenge.listener;
 
 import de.funboyy.challenge.RandomDropsPlugin;
+import de.funboyy.challenge.utils.Timer;
+import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,88 +18,106 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+@AllArgsConstructor
 public class ProtectionListener implements Listener {
+    
+    private final RandomDropsPlugin plugin;
 
     @EventHandler
-    public void onClick(final InventoryClickEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handleInventoryClick(final InventoryClickEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onBreak(final BlockBreakEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handleBlockBreak(final BlockBreakEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onPlace(final BlockPlaceEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handleBlockPlace(final BlockPlaceEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onDrop(final PlayerDropItemEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handlePlayerDropItem(final PlayerDropItemEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onPickUp(final EntityPickupItemEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handleEntityPickupItem(final EntityPickupItemEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onFoodLevelChange(final FoodLevelChangeEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleFoodLevelChange(final FoodLevelChangeEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning()) {
             event.setFoodLevel(20);
         }
     }
 
     @EventHandler
-    public void onDamage(final EntityDamageEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleEntityDamage(final EntityDamageEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onInteract(final PlayerInteractEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handlePlayerInteract(final PlayerInteractEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onEntityExplode(final EntityExplodeEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleEntityExplode(final EntityExplodeEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onBlockExplode(final BlockExplodeEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleBlockExplode(final BlockExplodeEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onMove(final PlayerMoveEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning() &&
-                !RandomDropsPlugin.getInstance().getTimer().isFinished()) {
+    public void handlePlayerMove(final PlayerMoveEvent event) {
+        final Timer timer = this.plugin.getTimer();
+        
+        if (!timer.isRunning() && !timer.isFinished()) {
             final Player player = event.getPlayer();
 
             if (event.getTo() == null) {

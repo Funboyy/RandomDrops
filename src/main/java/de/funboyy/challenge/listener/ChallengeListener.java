@@ -1,7 +1,10 @@
 package de.funboyy.challenge.listener;
 
-import de.funboyy.challenge.Config;
+import de.funboyy.challenge.Configuration;
 import de.funboyy.challenge.RandomDropsPlugin;
+import de.funboyy.challenge.utils.Timer;
+import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EnderDragon;
@@ -10,42 +13,55 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+@AllArgsConstructor
 public class ChallengeListener implements Listener {
 
+    private final RandomDropsPlugin plugin;
+
     @EventHandler
-    public void onPlayerDeath(final PlayerDeathEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handlePlayerDeath(final PlayerDeathEvent event) {
+        final Timer timer = this.plugin.getTimer();
+
+        if (!timer.isRunning()) {
             return;
         }
 
-        if (!Config.getInstance().failOnDeath()) {
+        final Configuration configuration = this.plugin.getConfiguration();
+
+        if (!configuration.failOnDeath()) {
             return;
         }
 
-        RandomDropsPlugin.getInstance().getTimer().stop();
-        RandomDropsPlugin.getInstance().getTimer().setFinished(true);
+        timer.stop();
+        timer.finish();
 
         final String reason = event.getDeathMessage();
-        Bukkit.getScheduler().runTaskLater(RandomDropsPlugin.getInstance(), () -> {
+
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             event.getEntity().spigot().respawn();
 
             Bukkit.getOnlinePlayers().forEach(player -> player.setGameMode(GameMode.SPECTATOR));
 
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(Config.getInstance().getDeathMessage()
-                    .replace("%deathMessage%", reason == null ? "error" : reason));
-            Bukkit.broadcastMessage(Config.getInstance().getDeathFinished());
-            Bukkit.broadcastMessage(Config.getInstance().getDeathTime()
-                    .replace("%duration%", RandomDropsPlugin.getInstance().getTimer().toString()));
-            Bukkit.broadcastMessage("");
+            final ComponentBuilder builder = new ComponentBuilder("")
+                    .append("\n")
+                    .append(configuration.getDeathMessage().replace("%deathMessage%", reason == null ? "error" : reason))
+                    .append("\n")
+                    .append(configuration.getDeathFinished())
+                    .append("\n")
+                    .append(configuration.getDeathTime().replace("%duration%", timer.getFormattedDuration()))
+                    .append("\n");
+
+            Bukkit.spigot().broadcast(builder.build());
         }, 2);
 
         event.setDeathMessage(null);
     }
 
     @EventHandler
-    public void onEntityDeath(final EntityDeathEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleEntityDeath(final EntityDeathEvent event) {
+        final Timer timer = this.plugin.getTimer();
+
+        if (!timer.isRunning()) {
             return;
         }
 
@@ -53,15 +69,20 @@ public class ChallengeListener implements Listener {
             return;
         }
 
-        RandomDropsPlugin.getInstance().getTimer().stop();
-        RandomDropsPlugin.getInstance().getTimer().setFinished(true);
+        timer.stop();
+        timer.finish();
 
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(Config.getInstance().getKillMessage());
-        Bukkit.broadcastMessage(Config.getInstance().getKillFinished());
-        Bukkit.broadcastMessage(Config.getInstance().getKillTime()
-                .replace("%duration%", RandomDropsPlugin.getInstance().getTimer().toString()));
-        Bukkit.broadcastMessage("");
+        final Configuration configuration = this.plugin.getConfiguration();
+        final ComponentBuilder builder = new ComponentBuilder("")
+                .append("\n")
+                .append(configuration.getKillMessage())
+                .append("\n")
+                .append(configuration.getKillFinished())
+                .append("\n")
+                .append(configuration.getKillTime().replace("%duration%", timer.getFormattedDuration()))
+                .append("\n");
+
+        Bukkit.spigot().broadcast(builder.build());
     }
 
 }

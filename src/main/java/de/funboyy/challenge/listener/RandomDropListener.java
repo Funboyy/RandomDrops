@@ -1,22 +1,18 @@
 package de.funboyy.challenge.listener;
 
 import de.funboyy.challenge.RandomDropsPlugin;
-import de.funboyy.challenge.utils.NBTUtils;
-import de.funboyy.challenge.utils.RandomDrop;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
+import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartChest;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartContainer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartHopper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Minecart;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftChestBoat;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftMinecartChest;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftMinecartHopper;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -34,50 +30,53 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.Lootable;
 
+@AllArgsConstructor
 public class RandomDropListener implements Listener {
 
+    private final RandomDropsPlugin plugin;
+
     @EventHandler(ignoreCancelled = true)
-    public void onItemSpawn(final ItemSpawnEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleItemSpawn(final ItemSpawnEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
         final Item item = event.getEntity();
         final ItemStack itemStack = item.getItemStack();
 
-        if (NBTUtils.hasTag(itemStack)) {
-            item.setItemStack(NBTUtils.removeTag(itemStack));
+        if (this.plugin.getManager().hasFlag(itemStack)) {
+            item.setItemStack(this.plugin.getManager().removeFlag(itemStack));
             return;
         }
 
-        final ItemStack drop = RandomDrop.getInstance().getDrop(item);
+        final ItemStack drop = this.plugin.getRandom().getDrop(item);
         item.setItemStack(drop);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDrop(final PlayerDropItemEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handlePlayerItemDrop(final PlayerDropItemEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
         final Item item = event.getItemDrop();
         final ItemStack itemStack = item.getItemStack();
 
-        item.setItemStack(NBTUtils.addTag(itemStack));
+        item.setItemStack(this.plugin.getManager().addFlag(itemStack));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDispense(final BlockDispenseEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleBlockDispense(final BlockDispenseEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
-        event.setItem(NBTUtils.addTag(event.getItem()));
+        event.setItem(this.plugin.getManager().addFlag(event.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDamage(final EntityDamageEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleItemDamage(final EntityDamageEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
@@ -85,12 +84,12 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        frame.setItem(NBTUtils.addTag(frame.getItem()));
+        frame.setItem(this.plugin.getManager().addFlag(frame.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onHangingBreak(final HangingBreakEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleHangingBreak(final HangingBreakEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
@@ -104,34 +103,34 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        frame.setItem(NBTUtils.addTag(frame.getItem()));
+        frame.setItem(this.plugin.getManager().addFlag(frame.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(final BlockBreakEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleBlockBreak(final BlockBreakEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
-        dropLoot(event.getBlock().getState());
+        this.dropLoot(event.getBlock().getState());
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEntityExplode(final EntityExplodeEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleEntityExplode(final EntityExplodeEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
-        event.blockList().forEach(block -> dropLoot(block.getState()));
+        event.blockList().forEach(block -> this.dropLoot(block.getState()));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockExplode(final BlockExplodeEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleBlockExplode(final BlockExplodeEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
-        event.blockList().forEach(block -> dropLoot(block.getState()));
+        event.blockList().forEach(block -> this.dropLoot(block.getState()));
     }
 
     private void dropLoot(final BlockState state) {
@@ -153,12 +152,12 @@ public class RandomDropListener implements Listener {
 
         container.getInventory().clear();
         Arrays.stream(items).filter(Objects::nonNull).forEach(item ->
-                location.getWorld().dropItemNaturally(location, NBTUtils.addTag(item)));
+                location.getWorld().dropItemNaturally(location, this.plugin.getManager().addFlag(item)));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDeath(final PlayerDeathEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handlePlayerDeath(final PlayerDeathEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
@@ -169,34 +168,40 @@ public class RandomDropListener implements Listener {
         }
 
         event.getDrops().forEach(item ->
-                location.getWorld().dropItemNaturally(location, NBTUtils.addTag(item)));
+                location.getWorld().dropItemNaturally(location, this.plugin.getManager().addFlag(item)));
         event.getDrops().clear();
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onVehicleDestroy(final VehicleDestroyEvent event) {
-        if (!RandomDropsPlugin.getInstance().getTimer().isRunning()) {
+    public void handleVehicleDestroy(final VehicleDestroyEvent event) {
+        if (!this.plugin.getTimer().isRunning()) {
             return;
         }
 
-        if (!(event.getVehicle() instanceof Minecart)) {
+        if (!(event.getVehicle() instanceof Minecart) && !(event.getVehicle() instanceof ChestBoat)) {
             return;
         }
 
-        dropLootEntity(event.getVehicle());
+        this.dropLootEntity(event.getVehicle());
     }
 
     private void dropLootEntity(final Entity entity) {
-        if (!(entity instanceof CraftMinecartContainer)) {
+        if (!(entity instanceof Lootable lootable)) {
             return;
         }
 
         final Inventory inventory;
 
-        if (entity instanceof CraftMinecartChest) {
-            inventory = ((CraftMinecartChest) entity).getInventory();
-        } else {
-            inventory = ((CraftMinecartHopper) entity).getInventory();
+        switch (entity) {
+            case CraftChestBoat chest ->
+                    inventory = chest.getInventory();
+            case CraftMinecartChest chest ->
+                    inventory = chest.getInventory();
+            case CraftMinecartHopper hopper ->
+                    inventory = hopper.getInventory();
+            default -> {
+                return;
+            }
         }
 
         ItemStack[] items = inventory.getContents();
@@ -206,16 +211,14 @@ public class RandomDropListener implements Listener {
             return;
         }
 
-        final Lootable loot = (Lootable) entity;
-
-        if (loot.getLootTable() != null) {
-            final LootContext.Builder lootContextBuilder = new LootContext.Builder(entity.getLocation());
-            items = loot.getLootTable().populateLoot(new Random(), lootContextBuilder.build()).toArray(new ItemStack[0]);
+        if (lootable.getLootTable() != null) {
+            final LootContext.Builder builder = new LootContext.Builder(entity.getLocation());
+            items = lootable.getLootTable().populateLoot(new Random(), builder.build()).toArray(new ItemStack[0]);
         }
 
         inventory.clear();
         Arrays.stream(items).filter(Objects::nonNull).forEach(item ->
-                location.getWorld().dropItemNaturally(location, NBTUtils.addTag(item)));
+                location.getWorld().dropItemNaturally(location, this.plugin.getManager().addFlag(item)));
     }
 
 }

@@ -1,14 +1,30 @@
 package de.funboyy.challenge.utils;
 
+import de.funboyy.challenge.RandomDropsPlugin;
+import java.time.Instant;
 import lombok.Getter;
-import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
 
 public class Timer {
 
     private long start = 0;
     private long duration = 0;
     private boolean running = false;
-    @Getter @Setter private boolean finished = false;
+    @Getter
+    private boolean finished = false;
+
+    public Timer(final RandomDropsPlugin plugin) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () ->
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    final ComponentBuilder builder = new ComponentBuilder("")
+                            .append(plugin.getTimer().getFormattedDuration()).color(ChatColor.GOLD).bold(true);
+
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, builder.build());
+                }), 0, 10);
+    }
 
     public void start() {
         if (this.running || this.finished) {
@@ -16,7 +32,7 @@ public class Timer {
         }
 
         this.running = true;
-        this.start = System.currentTimeMillis();
+        this.start = Instant.now().toEpochMilli();
     }
 
     public void stop() {
@@ -24,9 +40,17 @@ public class Timer {
             return;
         }
 
-        this.duration += (System.currentTimeMillis() - this.start);
+        this.duration += (Instant.now().toEpochMilli() - this.start);
         this.start = 0;
         this.running = false;
+    }
+
+    public void finish() {
+        this.finished = true;
+    }
+
+    public boolean isRunning() {
+        return this.running && !this.finished;
     }
 
     public long getDuration() {
@@ -34,15 +58,10 @@ public class Timer {
             return this.duration;
         }
 
-        return (System.currentTimeMillis() - this.start) + this.duration;
+        return (Instant.now().toEpochMilli() - this.start) + this.duration;
     }
 
-    public boolean isRunning() {
-        return this.running && !this.finished;
-    }
-
-    @Override
-    public String toString() {
+    public String getFormattedDuration() {
         final long duration = getDuration();
 
         final long days = duration / 1000 / 60 / 60 / 24;
@@ -56,11 +75,11 @@ public class Timer {
         final StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < times.length; i++) {
-            if (builder.length() != 0) {
+            if (!builder.isEmpty()) {
                 builder.append(" ");
             }
 
-            if (times[i] <= 0 && builder.length() == 0 && i != times.length - 1) {
+            if (times[i] <= 0 && builder.isEmpty() && i != times.length - 1) {
                 continue;
             }
 

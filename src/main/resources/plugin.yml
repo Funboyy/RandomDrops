@@ -1,9 +1,9 @@
-#file: noinspection YAMLSchemaValidation
+#file: noinspection YAMLSchemaValidation, PluginYml
 name: ${project.name}
 author: ${project.organization.name}
 version: ${project.version}
-main: ${project.main}
-api-version: 1.19
+main: ${plugin.main}
+api-version: '1.21.5'
 
 commands:
   challenge:

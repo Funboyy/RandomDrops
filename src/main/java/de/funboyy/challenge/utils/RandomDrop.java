@@ -7,16 +7,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class RandomDrop {
 
-    private static RandomDrop instance;
-
-    public static RandomDrop getInstance() {
-        if (instance == null) {
-            instance = new RandomDrop();
-        }
-        return instance;
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
     private static final List<Material> BLOCKED_DROPS = Arrays.asList(
             Material.BARRIER,
             Material.SPAWNER,
@@ -31,27 +21,19 @@ public class RandomDrop {
             Material.TIPPED_ARROW,
             Material.END_PORTAL_FRAME,
             Material.LIGHT,
-            Material.BUNDLE,
-            Material.CHISELED_BOOKSHELF,
-            Material.PIGLIN_HEAD,
-            Material.PINK_PETALS,
-            Material.BRUSH,
-            Material.DECORATED_POT,
-            Material.PAINTING
+            Material.PAINTING,
+            Material.VAULT,
+            Material.FARMLAND
     );
 
     private static final List<String> BLOCKED_DROP_NAMES = Arrays.asList(
+            "LEGACY",
             "COMMAND_BLOCK",
             "SPAWN_EGG",
             "STRUCTURE",
             "POTION",
-            "SMITHING_TEMPLATE",
-            "HANGING_SIGN",
-            "BAMBOO_",
-            "CHERRY",
             "SUSPICIOUS",
-            "POTTERY_SHARD",
-            "TORCHFLOWER"
+            "TEST"
     );
 
     private static boolean isDrop(final Material material) {
@@ -70,7 +52,6 @@ public class RandomDrop {
 
     private static final List<Material> DROPS = Arrays.stream(Material.values()).filter(Material::isItem)
             .filter(RandomDrop::isDrop).toList();
-
 
     private final Map<Material, Material> randomDrops;
     private final Random random;
