@@ -9,7 +9,6 @@ public class RandomDrop {
 
     private static final List<Material> BLOCKED_DROPS = Arrays.asList(
             Material.BARRIER,
-            Material.SPAWNER,
             Material.DEBUG_STICK,
             Material.JIGSAW,
             Material.DRAGON_EGG,
@@ -23,7 +22,8 @@ public class RandomDrop {
             Material.LIGHT,
             Material.PAINTING,
             Material.VAULT,
-            Material.FARMLAND
+            Material.FARMLAND,
+            Material.DIRT_PATH
     );
 
     private static final List<String> BLOCKED_DROP_NAMES = Arrays.asList(
@@ -33,7 +33,8 @@ public class RandomDrop {
             "STRUCTURE",
             "POTION",
             "SUSPICIOUS",
-            "TEST"
+            "TEST",
+            "SPAWNER"
     );
 
     private static boolean isDrop(final Material material) {
